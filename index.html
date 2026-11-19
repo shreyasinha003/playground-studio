@@ -1,0 +1,3206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Groq Studio ✨ | Pastel LPU LLM Playground</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       PASTEL MINIMAL DESIGN SYSTEM & ROOT VARIABLES
+       ========================================================================== */
+    :root {
+      /* Backgrounds */
+      --bg-cream: #FFFDF9;
+      --bg-card: #FFFFFF;
+      --bg-card-warm: #FCFBF8;
+      --bg-card-subtle: #FAF7F2;
+      --bg-hover: #F6F2EB;
+      
+      /* Hairline Borders */
+      --border-subtle: #EFE8DE;
+      --border-light: #F7F3EC;
+      --border-strong: #DFD7CB;
+      --border-focus: #C4B5FD;
+      
+      /* Text Colors */
+      --text-main: #2A2521;
+      --text-body: #524B45;
+      --text-muted: #847C74;
+      --text-faint: #B5ADA4;
+      
+      /* Pastel Palette */
+      --lavender: #C4B5FD;
+      --lavender-light: #F4EFFF;
+      --lavender-subtle: #FAF7FF;
+      --lavender-dark: #6D28D9;
+      --lavender-border: #DDD6FE;
+      
+      --peach: #FDBA74;
+      --peach-light: #FFF5EA;
+      --peach-subtle: #FFF9F2;
+      --peach-dark: #C2410C;
+      --peach-border: #FED7AA;
+      --coral: #FB923C;
+      --coral-hover: #F97316;
+      
+      --mint: #86EFAC;
+      --mint-light: #F0FDF4;
+      --mint-dark: #047857;
+      --mint-border: #BBF7D0;
+      
+      --sky: #93C5FD;
+      --sky-light: #F0F7FF;
+      --sky-dark: #1D4ED8;
+      --sky-border: #BFDBFE;
+      
+      --butter: #FDE68A;
+      --butter-light: #FEFCE8;
+      --butter-dark: #B45309;
+
+      /* Radii */
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+
+      /* Shadows */
+      --shadow-sm: 0 2px 8px rgba(70, 50, 30, 0.03), 0 1px 2px rgba(70, 50, 30, 0.02);
+      --shadow-md: 0 6px 20px -2px rgba(70, 50, 30, 0.05), 0 2px 6px -1px rgba(70, 50, 30, 0.03);
+      --shadow-lg: 0 16px 36px -6px rgba(70, 50, 30, 0.08), 0 4px 12px -2px rgba(70, 50, 30, 0.03);
+      --shadow-glow-peach: 0 4px 16px rgba(251, 146, 60, 0.28);
+      --shadow-glow-lavender: 0 4px 16px rgba(196, 181, 253, 0.35);
+
+      /* Typography */
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Soft Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #E8E0D5;
+      border-radius: var(--radius-full);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #D4CBC0;
+    }
+
+    /* SVG Icon Utility */
+    .icon {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    button {
+      font-family: var(--font-sans);
+      cursor: pointer;
+      border: none;
+      outline: none;
+      background: transparent;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    input, select, textarea {
+      font-family: var(--font-sans);
+      outline: none;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-main);
+      transition: all 0.18s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(196, 181, 253, 0.25);
+    }
+
+    /* ==========================================================================
+       TOP NAVIGATION BAR
+       ========================================================================== */
+    .navbar {
+      height: 64px;
+      background: rgba(255, 253, 249, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .brand-icon-box {
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #FDBA74 0%, #C4B5FD 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(251, 146, 60, 0.2);
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-sparkle {
+      font-size: 14px;
+    }
+
+    .workspace-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .workspace-pill:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+      border-color: var(--border-strong);
+    }
+    .workspace-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #86EFAC;
+      box-shadow: 0 0 6px #86EFAC;
+    }
+
+    .api-key-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--sky-border);
+      color: var(--sky-dark);
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+    .api-key-btn:hover {
+      background: var(--sky-light);
+      border-color: var(--sky);
+      transform: translateY(-1px);
+    }
+    .api-key-btn.has-key {
+      background: var(--mint-light);
+      border-color: var(--mint-border);
+      color: var(--mint-dark);
+    }
+
+    .demo-toggle-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--peach-subtle);
+      border: 1px solid var(--peach-border);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--peach-dark);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+    .demo-toggle-pill:hover {
+      background: var(--peach-light);
+    }
+    .demo-toggle-pill.active {
+      background: linear-gradient(135deg, #FFF4E6 0%, #FFE9D1 100%);
+      border-color: var(--peach);
+      box-shadow: 0 2px 8px rgba(253, 186, 116, 0.25);
+    }
+
+    .nav-center {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .model-selector-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 3px 6px 3px 12px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    .model-selector-wrap:hover {
+      border-color: var(--lavender-border);
+    }
+    .model-icon {
+      color: var(--lavender-dark);
+      margin-right: 6px;
+    }
+    .model-select {
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      padding-right: 22px;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      width: 230px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .model-select:focus {
+      box-shadow: none;
+      border: none;
+    }
+    .model-arrow {
+      position: absolute;
+      right: 38px;
+      pointer-events: none;
+      color: var(--text-muted);
+    }
+    .copy-model-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+    }
+    .copy-model-btn:hover {
+      background: var(--lavender-light);
+      color: var(--lavender-dark);
+      border-color: var(--lavender-border);
+    }
+
+    .view-code-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+    }
+    .view-code-btn:hover {
+      background: var(--lavender-light);
+      border-color: var(--lavender);
+      color: var(--lavender-dark);
+      transform: translateY(-1px);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 3px;
+    }
+    .nav-tab-link {
+      padding: 5px 13px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .nav-tab-link:hover {
+      color: var(--text-main);
+    }
+    .nav-tab-link.active {
+      background: var(--bg-card);
+      color: var(--text-main);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .avatar-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #C4B5FD 0%, #93C5FD 50%, #86EFAC 100%);
+      padding: 2px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease;
+    }
+    .avatar-badge:hover {
+      transform: scale(1.05);
+    }
+    .avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--lavender-dark);
+    }
+
+    /* ==========================================================================
+       MAIN CONTAINER & LAYOUT
+       ========================================================================== */
+    .app-layout {
+      flex: 1;
+      display: flex;
+      height: calc(100vh - 64px);
+      overflow: hidden;
+    }
+
+    /* Center / Main Workspace */
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 20px 28px;
+      gap: 16px;
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Right Sidebar Parameters */
+    .parameters-sidebar {
+      width: 340px;
+      min-width: 320px;
+      background: var(--bg-card-warm);
+      border-left: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    /* ==========================================================================
+       WORKSPACE SUBHEADER & PROMPT ANALYZER
+       ========================================================================== */
+    .workspace-subhead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .mode-switch-group {
+      display: flex;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 3px;
+      box-shadow: var(--shadow-sm);
+    }
+    .mode-pill {
+      padding: 5px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mode-pill.active {
+      background: var(--lavender-light);
+      color: var(--lavender-dark);
+      box-shadow: 0 1px 4px rgba(109, 40, 217, 0.08);
+    }
+
+    .analyzer-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 4px 12px;
+      box-shadow: var(--shadow-sm);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .analyzer-stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .analyzer-stat strong {
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+    }
+    .analyzer-sep {
+      color: var(--border-strong);
+    }
+    .analyzer-badge {
+      background: var(--mint-light);
+      color: var(--mint-dark);
+      border: 1px solid var(--mint-border);
+      border-radius: var(--radius-full);
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ==========================================================================
+       SYSTEM PROMPT CARD
+       ========================================================================== */
+    .system-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    .system-card:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: var(--shadow-md);
+    }
+
+    .system-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--bg-card-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      cursor: pointer;
+      user-select: none;
+    }
+    .system-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .system-toggle-icon {
+      color: var(--text-muted);
+      transition: transform 0.2s ease;
+    }
+    .system-card.collapsed .system-toggle-icon {
+      transform: rotate(-90deg);
+    }
+    .system-card.collapsed .system-body {
+      display: none;
+    }
+
+    .system-body {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .system-textarea {
+      width: 100%;
+      min-height: 56px;
+      max-height: 140px;
+      resize: vertical;
+      border: 1px solid transparent;
+      background: transparent;
+      font-size: 13.5px;
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 0;
+    }
+    .system-textarea:focus {
+      box-shadow: none;
+      border: 1px solid transparent;
+    }
+
+    .system-presets-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .preset-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .preset-chip {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .preset-chip:hover {
+      background: var(--lavender-light);
+      border-color: var(--lavender-border);
+      color: var(--lavender-dark);
+      transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+       CONVERSATION THREAD & MESSAGES
+       ========================================================================== */
+    .conversation-thread {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .message-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .message-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
+    }
+    .message-card.role-user {
+      border-left: 3px solid var(--peach);
+    }
+    .message-card.role-assistant {
+      border-left: 3px solid var(--lavender);
+    }
+
+    .message-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      background: var(--bg-card-subtle);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .message-role-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .role-user .message-role-pill {
+      background: var(--peach-light);
+      color: var(--peach-dark);
+      border: 1px solid var(--peach-border);
+    }
+    .role-assistant .message-role-pill {
+      background: var(--lavender-light);
+      color: var(--lavender-dark);
+      border: 1px solid var(--lavender-border);
+    }
+
+    .message-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .msg-action-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+    }
+    .msg-action-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+    }
+    .msg-action-btn.delete-btn:hover {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+
+    .message-body {
+      padding: 16px 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-main);
+    }
+
+    .user-textarea {
+      width: 100%;
+      min-height: 72px;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-main);
+      resize: vertical;
+      padding: 0;
+    }
+    .user-textarea:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    /* Markdown & Assistant Content */
+    .assistant-content {
+      word-break: break-word;
+    }
+    .assistant-content p {
+      margin-bottom: 10px;
+    }
+    .assistant-content p:last-child {
+      margin-bottom: 0;
+    }
+    .assistant-content pre {
+      background: #252220;
+      color: #F7F4F0;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      margin: 12px 0;
+      position: relative;
+      border: 1px solid #3B3632;
+    }
+    .assistant-content code {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: var(--peach-dark);
+    }
+    .assistant-content pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: inherit;
+    }
+    .copy-code-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #E2DED9;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .copy-code-tag:hover {
+      background: rgba(255, 255, 255, 0.22);
+      color: white;
+    }
+
+    /* Typewriter Cursor */
+    .streaming-cursor {
+      display: inline-block;
+      width: 7px;
+      height: 14px;
+      background: var(--peach);
+      margin-left: 3px;
+      vertical-align: middle;
+      border-radius: 2px;
+      animation: blink 0.8s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ==========================================================================
+       REASONING ACCORDION (THOUGHT PROCESS 💭)
+       ========================================================================== */
+    .reasoning-accordion {
+      margin-bottom: 14px;
+      border: 1px solid var(--lavender-border);
+      border-radius: var(--radius-md);
+      background: var(--lavender-subtle);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    .reasoning-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--lavender-light);
+      cursor: pointer;
+      user-select: none;
+    }
+    .reasoning-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--lavender-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .reasoning-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .reasoning-body {
+      padding: 12px 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: #4C3C78;
+      background: #FCFAFF;
+      border-top: 1px solid var(--lavender-border);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .reasoning-accordion.collapsed .reasoning-body {
+      display: none;
+    }
+
+    /* ==========================================================================
+       LIVE TELEMETRY PILL BAR
+       ========================================================================== */
+    .telemetry-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      background: var(--bg-card-subtle);
+      border-top: 1px solid var(--border-light);
+      flex-wrap: wrap;
+    }
+    .telemetry-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 3px 9px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .telemetry-pill strong {
+      font-family: var(--font-mono);
+      color: var(--text-main);
+      font-weight: 600;
+    }
+    .telemetry-pill.speed {
+      background: var(--mint-light);
+      border-color: var(--mint-border);
+      color: var(--mint-dark);
+    }
+    .telemetry-pill.speed strong {
+      color: var(--mint-dark);
+    }
+    .telemetry-pill.ttft {
+      background: var(--sky-light);
+      border-color: var(--sky-border);
+      color: var(--sky-dark);
+    }
+    .telemetry-pill.ttft strong {
+      color: var(--sky-dark);
+    }
+
+    /* ==========================================================================
+       BOTTOM ACTION BAR
+       ========================================================================== */
+    .bottom-action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      position: sticky;
+      bottom: 20px;
+      z-index: 20;
+    }
+
+    .bottom-left-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-body);
+      transition: all 0.15s ease;
+    }
+    .btn-secondary:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+      border-color: var(--border-strong);
+    }
+
+    .bottom-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .shortcut-hint {
+      font-size: 12px;
+      color: var(--text-faint);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .kbd-chip {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .btn-submit {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #FB923C 0%, #F97316 100%);
+      color: white;
+      padding: 10px 22px;
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: var(--shadow-glow-peach);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-1.5px);
+      box-shadow: 0 6px 20px rgba(251, 146, 60, 0.4);
+    }
+    .btn-submit:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-submit.is-streaming {
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+      box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+    }
+
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ==========================================================================
+       RIGHT SIDEBAR (PARAMETERS PANEL)
+       ========================================================================== */
+    .sidebar-header {
+      padding: 18px 20px 14px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sidebar-reset-btn {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-faint);
+      cursor: pointer;
+    }
+    .sidebar-reset-btn:hover {
+      color: var(--peach-dark);
+    }
+
+    .sidebar-content {
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* Parameter Slider Group */
+    .param-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .param-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .param-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .param-help {
+      color: var(--text-faint);
+      cursor: help;
+    }
+    .param-num-input {
+      width: 58px;
+      padding: 3px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: right;
+      color: var(--text-main);
+    }
+
+    /* Custom Slider */
+    .pastel-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 4px;
+      background: #EAE3D8;
+      outline: none;
+      border: none;
+      cursor: pointer;
+    }
+    .pastel-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--lavender);
+      border: 2px solid white;
+      box-shadow: 0 2px 6px rgba(109, 40, 217, 0.25);
+      cursor: grab;
+      transition: all 0.15s ease;
+    }
+    .pastel-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      background: var(--lavender-dark);
+    }
+    .pastel-slider.peach-slider::-webkit-slider-thumb {
+      background: var(--peach);
+      box-shadow: 0 2px 6px rgba(251, 146, 60, 0.3);
+    }
+    .pastel-slider.peach-slider::-webkit-slider-thumb:hover {
+      background: var(--coral);
+    }
+
+    /* Dropdown Selection */
+    .param-select {
+      width: 100%;
+      padding: 7px 12px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--text-main);
+      font-weight: 500;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+    }
+
+    /* Toggle Switches */
+    .toggles-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 18px;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .toggle-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .toggle-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .toggle-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Switch Component */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 38px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider-toggle {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #E6DFD5;
+      transition: .25s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: var(--radius-full);
+    }
+    .slider-toggle:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .25s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    input:checked + .slider-toggle {
+      background-color: var(--lavender);
+    }
+    input:checked + .slider-toggle.mint-toggle {
+      background-color: var(--mint);
+    }
+    input:checked + .slider-toggle.peach-toggle {
+      background-color: var(--peach);
+    }
+    input:checked + .slider-toggle:before {
+      transform: translateX(16px);
+    }
+
+    /* Tools & MCP Sections */
+    .sidebar-section-divider {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .section-head-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-head-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .add-chip-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--lavender-dark);
+      cursor: pointer;
+    }
+    .add-chip-btn:hover {
+      background: var(--lavender-light);
+      border-color: var(--lavender-border);
+    }
+
+    .tools-list, .mcp-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tool-chip-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+    }
+    .tool-chip-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      color: var(--text-main);
+    }
+    .tool-remove-btn {
+      color: var(--text-faint);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .tool-remove-btn:hover {
+      color: #DC2626;
+    }
+
+    /* ==========================================================================
+       MODALS & OVERLAYS
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(42, 37, 33, 0.45);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      padding: 20px;
+      animation: fadeIn 0.15s ease-out;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 580px;
+      overflow: hidden;
+      animation: scaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-card.wide {
+      max-width: 720px;
+    }
+    @keyframes scaleUp {
+      from { transform: scale(0.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-card-warm);
+    }
+    .modal-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-close-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .modal-close-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 22px;
+      background: var(--bg-card-subtle);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    /* Modal Form Elements */
+    .input-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .input-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .text-input {
+      width: 100%;
+      padding: 9px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+    }
+
+    /* Code Modal Tabs */
+    .code-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+    .code-tab-btn {
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+    }
+    .code-tab-btn.active {
+      background: var(--lavender-light);
+      border-color: var(--lavender-border);
+      color: var(--lavender-dark);
+    }
+
+    .code-display-wrap {
+      position: relative;
+    }
+    .code-display {
+      background: #1F1B18;
+      color: #EBE5DF;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      max-height: 380px;
+      border: 1px solid #332D28;
+      white-space: pre;
+    }
+    .copy-snippet-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .copy-snippet-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    .toast-msg {
+      background: var(--text-main);
+      color: white;
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      font-size: 12.5px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: toastIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+    }
+    @keyframes toastIn {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .parameters-sidebar {
+        display: none;
+      }
+      .nav-center .model-select {
+        width: 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       TOP NAVIGATION BAR
+       ======================================================================== -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="brand-badge" title="Groq Studio - Powered by Groq LPUs">
+        <div class="brand-icon-box">⚡</div>
+        <div class="brand-title">Groq Studio <span class="brand-sparkle">✨</span></div>
+      </div>
+
+      <div class="workspace-pill" title="Current Workspace">
+        <span class="workspace-dot"></span>
+        <span>Personal / Default Project</span>
+      </div>
+
+      <button id="apiKeyBtn" class="api-key-btn" onclick="openApiKeyModal()">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5L10 10l-2-2 2-2 1.5 1.5L14 5l1.5-1.5L17 2l4 4zM3 21l4-4m0 0l-2-2m2 2l2 2"/></svg>
+        <span id="apiKeyBtnLabel">API Key</span>
+      </button>
+
+      <div id="demoModePill" class="demo-toggle-pill active" onclick="toggleDemoMode()" title="Click to toggle Demo/Live API Mode">
+        <span id="demoModeDot" style="font-size: 11px;">🟡</span>
+        <span id="demoModeText">Demo Mode Active</span>
+      </div>
+    </div>
+
+    <div class="nav-center">
+      <div class="model-selector-wrap" title="Select Groq Model">
+        <svg class="icon model-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <select id="modelSelect" class="model-select" onchange="onModelChange()">
+          <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Fast & Smart)</option>
+          <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (Ultra Fast ~850 T/s)</option>
+          <option value="deepseek-r1-distill-llama-70b">deepseek-r1-distill-llama-70b (Deep Reasoning)</option>
+          <option value="qwen-qwq-32b">qwen-qwq-32b (Math & Reasoning)</option>
+          <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (Flagship OSS)</option>
+        </select>
+        <svg class="icon model-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        <button class="copy-model-btn" onclick="copyModelId()" title="Copy Model ID">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+
+      <button class="view-code-btn" onclick="openCodeModal()">
+        <span>&lt;/&gt;</span>
+        <span>View Code</span>
+      </button>
+    </div>
+
+    <div class="nav-right">
+      <div class="nav-tabs">
+        <div class="nav-tab-link active" onclick="switchMainTab('playground')">Playground</div>
+        <div class="nav-tab-link" onclick="openMetricsModal()">Metrics</div>
+        <div class="nav-tab-link" onclick="openDocsModal()">Docs</div>
+      </div>
+
+      <div class="avatar-badge" title="User Profile">
+        <div class="avatar-inner">GS</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================================================================
+       MAIN APP LAYOUT
+       ======================================================================== -->
+  <div class="app-layout">
+    
+    <!-- LEFT/CENTER WORKSPACE -->
+    <main class="main-workspace">
+      
+      <!-- Sub-header with Studio Mode pills and live prompt analyzer -->
+      <div class="workspace-subhead">
+        <div class="mode-switch-group">
+          <button id="chatModeBtn" class="mode-pill active" onclick="setPlaygroundMode('chat')">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Chat</span>
+          </button>
+          <button id="studioModeBtn" class="mode-pill" onclick="setPlaygroundMode('studio')">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Studio</span>
+          </button>
+        </div>
+
+        <div class="analyzer-bar">
+          <div class="analyzer-stat">
+            <span>Chars:</span> <strong id="charCount">0</strong>
+          </div>
+          <span class="analyzer-sep">•</span>
+          <div class="analyzer-stat">
+            <span>Est. Tokens:</span> <strong id="tokenCount">0</strong>
+          </div>
+          <span class="analyzer-sep">•</span>
+          <div class="analyzer-badge" id="estLatencyBadge">
+            ⚡ ~35ms Groq LPU TTFT
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsible SYSTEM Prompt Card -->
+      <div id="systemCard" class="system-card">
+        <div class="system-header" onclick="toggleSystemCard()">
+          <div class="system-title">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.5h-2v-2h2zm0-4.5h-2v-5h2z"/></svg>
+            <span>System Prompt (Optional)</span>
+          </div>
+          <svg class="icon system-toggle-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+
+        <div class="system-body">
+          <textarea id="systemPromptInput" class="system-textarea" placeholder="Enter system instructions to guide model persona, formatting, or constraints..." oninput="updatePromptMetrics()"></textarea>
+          
+          <div class="system-presets-bar">
+            <span class="preset-label">Quick Presets:</span>
+            <button class="preset-chip" onclick="applyPreset('tutor')">🎓 Helpful Tutor</button>
+            <button class="preset-chip" onclick="applyPreset('json')">📦 JSON Extractor</button>
+            <button class="preset-chip" onclick="applyPreset('coder')">💻 Concise Coder</button>
+            <button class="preset-chip" onclick="applyPreset('story')">✨ Poetic Storyteller</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrollable Conversation Thread -->
+      <div id="conversationThread" class="conversation-thread">
+        <!-- Message cards dynamically inserted here -->
+      </div>
+
+      <!-- Bottom Action Bar -->
+      <div class="bottom-action-bar">
+        <div class="bottom-left-actions">
+          <button class="btn-secondary" onclick="appendUserMessage()">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Add Message</span>
+          </button>
+          <button class="btn-secondary" onclick="clearConversation()">
+            <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Clear</span>
+          </button>
+        </div>
+
+        <div class="bottom-right-actions">
+          <div class="shortcut-hint">
+            <span>Shortcut</span>
+            <span class="kbd-chip">⌘ + Enter</span>
+          </div>
+
+          <button id="submitBtn" class="btn-submit" onclick="handleFormSubmit()">
+            <svg id="submitIcon" class="icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span id="submitLabel">Submit</span>
+          </button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR: PARAMETERS PANEL -->
+    <aside class="parameters-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+          <span>Parameters</span>
+        </div>
+        <button class="sidebar-reset-btn" onclick="resetParameters()">Reset Defaults</button>
+      </div>
+
+      <div class="sidebar-content">
+        <!-- Temperature -->
+        <div class="param-group">
+          <div class="param-label-row">
+            <span class="param-label">
+              <span>Temperature</span>
+              <span class="param-help" title="Controls randomness: lower is more deterministic, higher is more creative.">ⓘ</span>
+            </span>
+            <input type="number" id="tempInput" class="param-num-input" min="0" max="2" step="0.01" value="1.00" oninput="syncTempSlider(this.value)">
+          </div>
+          <input type="range" id="tempSlider" class="pastel-slider peach-slider" min="0" max="2" step="0.01" value="1.00" oninput="syncTempInput(this.value)">
+        </div>
+
+        <!-- Max Completion Tokens -->
+        <div class="param-group">
+          <div class="param-label-row">
+            <span class="param-label">
+              <span>Max Tokens</span>
+              <span class="param-help" title="Maximum tokens the model can generate in a single response.">ⓘ</span>
+            </span>
+            <input type="number" id="maxTokensInput" class="param-num-input" min="1" max="8192" step="1" value="2048" oninput="syncMaxTokensSlider(this.value)">
+          </div>
+          <input type="range" id="maxTokensSlider" class="pastel-slider" min="1" max="8192" step="1" value="2048" oninput="syncMaxTokensInput(this.value)">
+        </div>
+
+        <!-- Reasoning Effort -->
+        <div class="param-group">
+          <div class="param-label-row">
+            <span class="param-label">
+              <span>Reasoning Effort</span>
+              <span class="param-help" title="Constrains depth of thought traces on reasoning models like DeepSeek-R1 and QwQ.">ⓘ</span>
+            </span>
+          </div>
+          <select id="reasoningEffortSelect" class="param-select">
+            <option value="none">None</option>
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium (Recommended)</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+
+        <!-- Toggles Section -->
+        <div class="toggles-section">
+          <!-- Stream Toggle -->
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-title">Stream</span>
+              <span class="toggle-desc">Live token-by-token response</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="streamToggle" checked>
+              <span class="slider-toggle mint-toggle"></span>
+            </label>
+          </div>
+
+          <!-- JSON Mode Toggle -->
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-title">JSON Mode</span>
+              <span class="toggle-desc">Enforce valid JSON object output</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="jsonModeToggle" onchange="onJsonModeChange()">
+              <span class="slider-toggle peach-toggle"></span>
+            </label>
+          </div>
+
+          <!-- Browser Search -->
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-title">Browser Search</span>
+              <span class="toggle-desc">Simulate live web browsing agent</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="browserSearchToggle">
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+
+          <!-- Code Interpreter -->
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-title">Code Interpreter</span>
+              <span class="toggle-desc">Sandbox execution capability</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="codeInterpreterToggle">
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Custom Function Tools -->
+        <div class="sidebar-section-divider">
+          <div class="section-head-row">
+            <span class="section-head-title">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>Custom Tools</span>
+            </span>
+            <button class="add-chip-btn" onclick="openAddToolModal()">+ Add Tool</button>
+          </div>
+          <div id="toolsList" class="tools-list">
+            <!-- Tool items dynamically listed here -->
+          </div>
+        </div>
+
+        <!-- MCP Servers Section -->
+        <div class="sidebar-section-divider">
+          <div class="section-head-row">
+            <span class="section-head-title">
+              <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+              <span>MCP Servers</span>
+            </span>
+            <button class="add-chip-btn" onclick="openAddMcpModal()">+ Add Server</button>
+          </div>
+          <div id="mcpList" class="mcp-list">
+            <!-- MCP items listed here -->
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ========================================================================
+       MODALS
+       ======================================================================== -->
+
+  <!-- API KEY MODAL -->
+  <div id="apiKeyModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg class="icon" style="color: var(--sky-dark);" viewBox="0 0 24 24"><path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5L10 10l-2-2 2-2 1.5 1.5L14 5l1.5-1.5L17 2l4 4z"/></svg>
+          <span>Groq API Key Settings</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('apiKeyModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+          Enter your Groq API Key to test against live Groq LPUs. Your key is securely stored in your browser's <code style="color: var(--peach-dark)">localStorage</code> and is never transmitted to any third party.
+        </p>
+        <div class="input-field-group">
+          <label class="input-label" for="apiKeyInput">Groq API Key (starts with <code>gsk_...</code>)</label>
+          <div style="position: relative;">
+            <input type="password" id="apiKeyInput" class="text-input" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+            <button type="button" onclick="toggleApiKeyVisibility()" style="position: absolute; right: 10px; top: 10px; font-size: 12px; color: var(--text-muted);">👁️</button>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px;">
+          <a href="https://console.groq.com/keys" target="_blank" style="color: var(--sky-dark); text-decoration: none; font-weight: 600;">Get a free API key at console.groq.com ↗</a>
+          <button class="btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="testApiKeyConnection()">⚡ Test Connection</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('apiKeyModal')">Cancel</button>
+        <button class="btn-submit" style="padding: 8px 18px; font-size: 13px;" onclick="saveApiKey()">Save Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW CODE MODAL -->
+  <div id="codeModal" class="modal-backdrop">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span style="font-family: var(--font-mono); color: var(--lavender-dark);">&lt;/&gt;</span>
+          <span>Live Generated Code</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('codeModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="code-tabs">
+          <button id="tabCurl" class="code-tab-btn active" onclick="switchCodeTab('curl')">cURL</button>
+          <button id="tabPython" class="code-tab-btn" onclick="switchCodeTab('python')">Python (groq)</button>
+          <button id="tabJs" class="code-tab-btn" onclick="switchCodeTab('js')">JavaScript (fetch)</button>
+        </div>
+        <div class="code-display-wrap">
+          <button class="copy-snippet-btn" onclick="copyCodeSnippet()">
+            <svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copy Snippet</span>
+          </button>
+          <pre id="codeSnippetPre" class="code-display"></pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('codeModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD CUSTOM TOOL MODAL -->
+  <div id="toolModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg class="icon" style="color: var(--peach-dark);" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>Add Function Tool Schema</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('toolModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="input-field-group">
+          <label class="input-label" for="toolPresetSelect">Load Sample Preset</label>
+          <select id="toolPresetSelect" class="param-select" onchange="loadToolPreset(this.value)">
+            <option value="weather">get_current_weather(location, unit)</option>
+            <option value="calculator">calculate_expression(expression)</option>
+            <option value="database">query_knowledge_base(query, max_results)</option>
+          </select>
+        </div>
+        <div class="input-field-group">
+          <label class="input-label" for="toolJsonTextarea">Function Definition JSON</label>
+          <textarea id="toolJsonTextarea" class="text-input" style="font-family: var(--font-mono); font-size: 11.5px; height: 160px; line-height: 1.4;"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('toolModal')">Cancel</button>
+        <button class="btn-submit" style="padding: 8px 18px; font-size: 13px;" onclick="addCustomTool()">Add Tool</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD MCP SERVER MODAL -->
+  <div id="mcpModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg class="icon" style="color: var(--mint-dark);" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/></svg>
+          <span>Attach MCP Server</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('mcpModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="input-field-group">
+          <label class="input-label" for="mcpNameInput">Server Identifier</label>
+          <input type="text" id="mcpNameInput" class="text-input" placeholder="e.g. github:repo-manager">
+        </div>
+        <div class="input-field-group">
+          <label class="input-label" for="mcpUrlInput">Endpoint / Transport URL</label>
+          <input type="text" id="mcpUrlInput" class="text-input" placeholder="http://localhost:8080/sse or stdio">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('mcpModal')">Cancel</button>
+        <button class="btn-submit" style="padding: 8px 18px; font-size: 13px;" onclick="addMcpServer()">Connect Server</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- METRICS MODAL -->
+  <div id="metricsModal" class="modal-backdrop">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>⚡ Groq LPU Performance & Session Telemetry</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('metricsModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px;">
+          <div style="background: var(--bg-card-subtle); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); text-align: center;">
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Total Requests</div>
+            <div id="metricTotalReqs" style="font-size: 24px; font-weight: 700; color: var(--text-main); font-family: var(--font-mono);">0</div>
+          </div>
+          <div style="background: var(--mint-light); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--mint-border); text-align: center;">
+            <div style="font-size: 11px; color: var(--mint-dark); text-transform: uppercase;">Avg Generation Speed</div>
+            <div id="metricAvgSpeed" style="font-size: 24px; font-weight: 700; color: var(--mint-dark); font-family: var(--font-mono);">480 T/s</div>
+          </div>
+          <div style="background: var(--sky-light); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--sky-border); text-align: center;">
+            <div style="font-size: 11px; color: var(--sky-dark); text-transform: uppercase;">Avg TTFT</div>
+            <div id="metricAvgTtft" style="font-size: 24px; font-weight: 700; color: var(--sky-dark); font-family: var(--font-mono);">38 ms</div>
+          </div>
+          <div style="background: var(--peach-light); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--peach-border); text-align: center;">
+            <div style="font-size: 11px; color: var(--peach-dark); text-transform: uppercase;">Total Tokens</div>
+            <div id="metricTotalTokens" style="font-size: 24px; font-weight: 700; color: var(--peach-dark); font-family: var(--font-mono);">0</div>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-card-warm); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px;">
+          <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Groq LPU vs Traditional Cloud GPUs Benchmark</h4>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span>Groq LPU (Llama 3.1 8B Instant)</span>
+                <strong style="color: var(--mint-dark);">~850 tokens/sec</strong>
+              </div>
+              <div style="height: 10px; background: #EFE8DF; border-radius: 5px; overflow: hidden;">
+                <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #86EFAC, #34D399);"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span>Groq LPU (Llama 3.3 70B Versatile)</span>
+                <strong style="color: var(--peach-dark);">~330 tokens/sec</strong>
+              </div>
+              <div style="height: 10px; background: #EFE8DF; border-radius: 5px; overflow: hidden;">
+                <div style="width: 40%; height: 100%; background: linear-gradient(90deg, #FDBA74, #FB923C);"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span>Standard GPU Provider (H100/A100)</span>
+                <strong style="color: var(--text-muted);">~45-70 tokens/sec</strong>
+              </div>
+              <div style="height: 10px; background: #EFE8DF; border-radius: 5px; overflow: hidden;">
+                <div style="width: 10%; height: 100%; background: #CBD5E1;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('metricsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCS / ABOUT MODAL -->
+  <div id="docsModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>📖 Groq Studio Documentation</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('docsModal')">✕</button>
+      </div>
+      <div class="modal-body" style="font-size: 13.5px; color: var(--text-body); line-height: 1.6;">
+        <h4 style="color: var(--text-main); font-size: 14px; margin-bottom: 4px;">What makes Groq LPUs so fast?</h4>
+        <p>Groq Language Processing Units (LPUs) are purpose-built for real-time sequential LLM inference. Unlike GPUs designed for parallel graphics shaders, LPUs feature deterministic memory architecture and compiler-scheduled execution, delivering instantaneous TTFT (Time to First Token) and blistering 300–850 tokens/sec throughput.</p>
+
+        <h4 style="color: var(--text-main); font-size: 14px; margin-top: 10px; margin-bottom: 4px;">Demo / Mock Mode</h4>
+        <p>You can test this entire studio without an API key! In Demo Mode, realistic simulated streams and reasoning traces simulate Groq's low-latency output. Toggle to Live Mode anytime by providing a valid Groq API key.</p>
+
+        <h4 style="color: var(--text-main); font-size: 14px; margin-top: 10px; margin-bottom: 4px;">Supported Reasoning Models</h4>
+        <p>Models like <code>deepseek-r1-distill-llama-70b</code> and <code>qwen-qwq-32b</code> render detailed chain-of-thought steps in the collapsible <strong>Reasoning / Thought Process 💭</strong> card before presenting their final answer.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-submit" style="padding: 8px 18px; font-size: 13px;" onclick="closeModal('docsModal')">Got it!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- ========================================================================
+       APPLICATION JAVASCRIPT LOGIC
+       ======================================================================== -->
+  <script>
+    /* ==========================================================================
+       APP STATE
+       ========================================================================== */
+    const state = {
+      apiKey: localStorage.getItem('groq_api_key') || '',
+      demoMode: !localStorage.getItem('groq_api_key'), // default true if no key saved
+      selectedModel: 'llama-3.3-70b-versatile',
+      playgroundMode: 'chat', // 'chat' or 'studio'
+      systemPrompt: '',
+      messages: [
+        {
+          id: 'msg-init-1',
+          role: 'user',
+          content: 'Explain why Groq LPUs achieve such dramatically lower latency and higher tokens per second compared to conventional GPUs.'
+        }
+      ],
+      params: {
+        temperature: 1.0,
+        maxTokens: 2048,
+        reasoningEffort: 'medium',
+        stream: true,
+        jsonMode: false,
+        browserSearch: false,
+        codeInterpreter: false
+      },
+      tools: [
+        {
+          name: 'get_current_weather',
+          description: 'Get current weather conditions for a given location',
+          schema: '{\n  "type": "function",\n  "function": {\n    "name": "get_current_weather",\n    "description": "Get current weather conditions for a given location",\n    "parameters": {\n      "type": "object",\n      "properties": {\n        "location": { "type": "string" },\n        "unit": { "type": "string", "enum": ["celsius", "fahrenheit"] }\n      },\n      "required": ["location"]\n    }\n  }\n}'
+        }
+      ],
+      mcpServers: [
+        { name: 'filesystem:workspace', url: 'stdio:local' },
+        { name: 'github:groq-studio', url: 'https://mcp.groq.internal/v1' }
+      ],
+      isGenerating: false,
+      abortController: null,
+      sessionMetrics: {
+        totalRequests: 0,
+        totalTokens: 0,
+        sumTtft: 0,
+        sumSpeed: 0
+      },
+      activeCodeTab: 'curl'
+    };
+
+    /* ==========================================================================
+       INITIALIZATION
+       ========================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      // Initialize UI from state
+      updateApiKeyUI();
+      updateDemoModeUI();
+      renderToolsList();
+      renderMcpList();
+      renderConversation();
+      updatePromptMetrics();
+
+      // Keyboard shortcut listener
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+          e.preventDefault();
+          handleFormSubmit();
+        }
+        if (e.key === 'Escape') {
+          closeAllModals();
+        }
+      });
+    });
+
+    /* ==========================================================================
+       TOAST NOTIFICATIONS
+       ========================================================================== */
+    function showToast(text, icon = '✨') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast-msg';
+      toast.innerHTML = `<span>${icon}</span><span>${text}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 200);
+      }, 2600);
+    }
+
+    /* ==========================================================================
+       API KEY & DEMO MODE MANAGEMENT
+       ========================================================================== */
+    function updateApiKeyUI() {
+      const btn = document.getElementById('apiKeyBtn');
+      const label = document.getElementById('apiKeyBtnLabel');
+      const input = document.getElementById('apiKeyInput');
+      if (state.apiKey) {
+        btn.classList.add('has-key');
+        const masked = state.apiKey.slice(0, 6) + '...' + state.apiKey.slice(-4);
+        label.textContent = masked;
+        input.value = state.apiKey;
+      } else {
+        btn.classList.remove('has-key');
+        label.textContent = 'API Key';
+        input.value = '';
+      }
+    }
+
+    function updateDemoModeUI() {
+      const pill = document.getElementById('demoModePill');
+      const dot = document.getElementById('demoModeDot');
+      const text = document.getElementById('demoModeText');
+      if (state.demoMode) {
+        pill.classList.add('active');
+        dot.textContent = '🟡';
+        text.textContent = 'Demo Mode Active';
+      } else {
+        pill.classList.remove('active');
+        dot.textContent = '🟢';
+        text.textContent = 'Live API Active';
+      }
+    }
+
+    function toggleDemoMode() {
+      if (!state.demoMode && !state.apiKey) {
+        showToast('Please set your Groq API key to use Live API Mode', '🔑');
+        openApiKeyModal();
+        return;
+      }
+      state.demoMode = !state.demoMode;
+      updateDemoModeUI();
+      showToast(state.demoMode ? 'Switched to Demo Mode (Mock Engine)' : 'Switched to Live Groq API Mode', state.demoMode ? '🟡' : '🚀');
+    }
+
+    function openApiKeyModal() {
+      document.getElementById('apiKeyInput').value = state.apiKey;
+      document.getElementById('apiKeyModal').classList.add('open');
+    }
+
+    function saveApiKey() {
+      const val = document.getElementById('apiKeyInput').value.trim();
+      state.apiKey = val;
+      localStorage.setItem('groq_api_key', val);
+      updateApiKeyUI();
+      closeModal('apiKeyModal');
+      if (val) {
+        state.demoMode = false;
+        updateDemoModeUI();
+        showToast('Groq API Key saved successfully!', '🎉');
+      } else {
+        state.demoMode = true;
+        updateDemoModeUI();
+        showToast('Key cleared; Demo Mode activated', 'ℹ️');
+      }
+    }
+
+    function toggleApiKeyVisibility() {
+      const input = document.getElementById('apiKeyInput');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    async function testApiKeyConnection() {
+      const testKey = document.getElementById('apiKeyInput').value.trim();
+      if (!testKey) {
+        showToast('Please type an API key first', '⚠️');
+        return;
+      }
+      showToast('Testing connection to Groq API...', '⏳');
+      const startTime = performance.now();
+      try {
+        const res = await fetch('https://api.groq.com/openai/v1/models', {
+          headers: { 'Authorization': `Bearer ${testKey}` }
+        });
+        const duration = Math.round(performance.now() - startTime);
+        if (res.ok) {
+          showToast(`Connection verified! Ping: ${duration}ms`, '⚡');
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(`Auth error (${res.status}): ${err.error?.message || 'Invalid key'}`, '❌');
+        }
+      } catch (err) {
+        showToast('Network error verifying key', '❌');
+      }
+    }
+
+    /* ==========================================================================
+       MODEL & PRESETS
+       ========================================================================== */
+    function onModelChange() {
+      state.selectedModel = document.getElementById('modelSelect').value;
+      updatePromptMetrics();
+      showToast(`Model set to: ${state.selectedModel}`, '🤖');
+    }
+
+    function copyModelId() {
+      navigator.clipboard.writeText(state.selectedModel);
+      showToast(`Copied "${state.selectedModel}" to clipboard!`, '📋');
+    }
+
+    function applyPreset(presetName) {
+      const presets = {
+        tutor: "You are an encouraging, world-class educator who breaks down complex concepts with clear analogies, gentle humor, and step-by-step clarity.",
+        json: "You are a precise data extraction specialist. Always format your output strictly as a valid, well-structured JSON object without conversational filler.",
+        coder: "You are an elite, highly concise software engineer. Provide high-performance, production-ready code with minimal explanation and idiomatic patterns.",
+        story: "You are an evocative, poetic storyteller with an eye for sensory details, rich metaphors, and unforgettable narrative voices."
+      };
+      const text = presets[presetName] || '';
+      document.getElementById('systemPromptInput').value = text;
+      state.systemPrompt = text;
+      // Ensure system card is expanded
+      document.getElementById('systemCard').classList.remove('collapsed');
+      updatePromptMetrics();
+      showToast(`Applied preset: ${presetName}`, '✨');
+    }
+
+    function toggleSystemCard() {
+      const card = document.getElementById('systemCard');
+      card.classList.toggle('collapsed');
+    }
+
+    function setPlaygroundMode(mode) {
+      state.playgroundMode = mode;
+      document.getElementById('chatModeBtn').classList.toggle('active', mode === 'chat');
+      document.getElementById('studioModeBtn').classList.toggle('active', mode === 'studio');
+      showToast(`Switched to ${mode === 'chat' ? 'Chat Mode' : 'Studio Single-Prompt Mode'}`, '🎨');
+    }
+
+    /* ==========================================================================
+       PROMPT METRICS & TOKEN ESTIMATION
+       ========================================================================== */
+    function updatePromptMetrics() {
+      const sysText = document.getElementById('systemPromptInput').value;
+      state.systemPrompt = sysText;
+
+      let allText = sysText;
+      state.messages.forEach(m => {
+        allText += ' ' + m.content;
+      });
+
+      const chars = allText.length;
+      // Rough OpenAI/Llama token estimate: ~4 chars per token
+      const estTokens = Math.max(1, Math.round(chars / 3.8));
+
+      document.getElementById('charCount').textContent = chars.toLocaleString();
+      document.getElementById('tokenCount').textContent = estTokens.toLocaleString();
+
+      // Latency badge depending on model
+      const latencyBadge = document.getElementById('estLatencyBadge');
+      if (state.selectedModel.includes('8b')) {
+        latencyBadge.innerHTML = '⚡ ~25ms Groq LPU (850 T/s)';
+      } else if (state.selectedModel.includes('r1') || state.selectedModel.includes('qwq')) {
+        latencyBadge.innerHTML = '🧠 ~45ms Thinking TTFT';
+      } else {
+        latencyBadge.innerHTML = '⚡ ~35ms Groq LPU (330 T/s)';
+      }
+    }
+
+    /* ==========================================================================
+       CONVERSATION UI RENDERING
+       ========================================================================== */
+    function renderConversation() {
+      const container = document.getElementById('conversationThread');
+      container.innerHTML = '';
+
+      state.messages.forEach((msg, index) => {
+        const card = document.createElement('div');
+        card.className = `message-card role-${msg.role}`;
+        card.id = `card-${msg.id}`;
+
+        const isUser = msg.role === 'user';
+        const roleLabel = isUser ? 'USER' : 'ASSISTANT';
+
+        // Header
+        const header = document.createElement('div');
+        header.className = 'message-header';
+        header.innerHTML = `
+          <div class="message-role-pill" onclick="toggleMsgRole('${msg.id}')" title="Click to toggle Role">
+            <span>${isUser ? '👤' : '🤖'}</span>
+            <span>${roleLabel}</span>
+          </div>
+          <div class="message-actions">
+            <button class="msg-action-btn" onclick="copyMessageText('${msg.id}')" title="Copy Message">
+              <svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <button class="msg-action-btn delete-btn" onclick="deleteMessage('${msg.id}')" title="Delete Turn">
+              <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        `;
+        card.appendChild(header);
+
+        // Body
+        const body = document.createElement('div');
+        body.className = 'message-body';
+
+        if (isUser) {
+          const textarea = document.createElement('textarea');
+          textarea.className = 'user-textarea';
+          textarea.value = msg.content;
+          textarea.placeholder = 'Type your prompt here...';
+          textarea.oninput = (e) => {
+            msg.content = e.target.value;
+            autoGrowTextarea(e.target);
+            updatePromptMetrics();
+          };
+          body.appendChild(textarea);
+          setTimeout(() => autoGrowTextarea(textarea), 0);
+        } else {
+          // Assistant reasoning accordion if present
+          if (msg.reasoning) {
+            const accordion = document.createElement('div');
+            accordion.className = 'reasoning-accordion';
+            accordion.id = `reasoning-${msg.id}`;
+            accordion.innerHTML = `
+              <div class="reasoning-header" onclick="toggleReasoningAccordion('${msg.id}')">
+                <div class="reasoning-title">
+                  <span>💭</span>
+                  <span>Reasoning / Thought Process</span>
+                </div>
+                <div class="reasoning-meta">
+                  <span>${msg.metrics?.thinkTime || 'Elapsed: 0.38s'}</span>
+                  <svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+              </div>
+              <div class="reasoning-body">${escapeHtml(msg.reasoning)}</div>
+            `;
+            body.appendChild(accordion);
+          }
+
+          // Main assistant content container
+          const contentDiv = document.createElement('div');
+          contentDiv.className = 'assistant-content';
+          contentDiv.id = `content-${msg.id}`;
+          contentDiv.innerHTML = formatMarkdown(msg.content);
+          body.appendChild(contentDiv);
+        }
+        card.appendChild(body);
+
+        // Telemetry Bar for Assistant replies
+        if (!isUser && msg.metrics) {
+          const telemetryBar = document.createElement('div');
+          telemetryBar.className = 'telemetry-bar';
+          telemetryBar.innerHTML = `
+            <div class="telemetry-pill ttft">
+              <span>⚡ TTFT:</span>
+              <strong>${msg.metrics.ttft} ms</strong>
+            </div>
+            <div class="telemetry-pill speed">
+              <span>🚀 Speed:</span>
+              <strong>${msg.metrics.tokensPerSec} T/s</strong>
+            </div>
+            <div class="telemetry-pill">
+              <span>📊 Tokens:</span>
+              <strong>${msg.metrics.totalTokens} toks</strong>
+            </div>
+            <div class="telemetry-pill">
+              <span>⏱️ Total:</span>
+              <strong>${msg.metrics.totalTime} s</strong>
+            </div>
+          `;
+          card.appendChild(telemetryBar);
+        }
+
+        container.appendChild(card);
+      });
+
+      updatePromptMetrics();
+    }
+
+    function autoGrowTextarea(el) {
+      el.style.height = 'auto';
+      el.style.height = (el.scrollHeight) + 'px';
+    }
+
+    function appendUserMessage() {
+      const newMsg = {
+        id: 'msg-' + Date.now(),
+        role: 'user',
+        content: ''
+      };
+      state.messages.push(newMsg);
+      renderConversation();
+      // Focus newly added textarea
+      const cards = document.querySelectorAll('.user-textarea');
+      if (cards.length) {
+        const last = cards[cards.length - 1];
+        last.focus();
+      }
+    }
+
+    function deleteMessage(id) {
+      if (state.messages.length <= 1) {
+        showToast('Keeping at least one message turn in conversation', 'ℹ️');
+        return;
+      }
+      state.messages = state.messages.filter(m => m.id !== id);
+      renderConversation();
+      showToast('Turn removed', '🗑️');
+    }
+
+    function toggleMsgRole(id) {
+      const msg = state.messages.find(m => m.id === id);
+      if (msg) {
+        msg.role = msg.role === 'user' ? 'assistant' : 'user';
+        renderConversation();
+      }
+    }
+
+    function copyMessageText(id) {
+      const msg = state.messages.find(m => m.id === id);
+      if (msg) {
+        navigator.clipboard.writeText(msg.content);
+        showToast('Message copied to clipboard!', '📋');
+      }
+    }
+
+    function toggleReasoningAccordion(id) {
+      const acc = document.getElementById(`reasoning-${id}`);
+      if (acc) {
+        acc.classList.toggle('collapsed');
+      }
+    }
+
+    function clearConversation() {
+      state.messages = [
+        {
+          id: 'msg-' + Date.now(),
+          role: 'user',
+          content: ''
+        }
+      ];
+      renderConversation();
+      showToast('Conversation cleared', '✨');
+    }
+
+    /* ==========================================================================
+       SUBMIT & EXECUTION ENGINE (REAL GROQ API + DEMO MODE)
+       ========================================================================== */
+    async function handleFormSubmit() {
+      if (state.isGenerating) {
+        // Abort active stream
+        if (state.abortController) {
+          state.abortController.abort();
+          state.abortController = null;
+        }
+        setGeneratingState(false);
+        showToast('Generation stopped', '⏹️');
+        return;
+      }
+
+      // Check user has content
+      const lastMsg = state.messages[state.messages.length - 1];
+      if (!lastMsg || !lastMsg.content.trim()) {
+        showToast('Please enter a prompt message before submitting', '✏️');
+        return;
+      }
+
+      // Create new assistant placeholder
+      const assistantId = 'msg-asst-' + Date.now();
+      const assistantMsg = {
+        id: assistantId,
+        role: 'assistant',
+        content: '',
+        reasoning: '',
+        metrics: null
+      };
+      state.messages.push(assistantMsg);
+      renderConversation();
+
+      // Scroll to bottom
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+      setGeneratingState(true);
+
+      if (state.demoMode) {
+        await executeDemoStream(assistantMsg);
+      } else {
+        await executeRealGroqApi(assistantMsg);
+      }
+    }
+
+    function setGeneratingState(isGen) {
+      state.isGenerating = isGen;
+      const btn = document.getElementById('submitBtn');
+      const label = document.getElementById('submitLabel');
+      const icon = document.getElementById('submitIcon');
+
+      if (isGen) {
+        btn.classList.add('is-streaming');
+        label.textContent = 'Stop';
+        icon.innerHTML = '<rect x="6" y="6" width="12" height="12"/>';
+      } else {
+        btn.classList.remove('is-streaming');
+        label.textContent = 'Submit';
+        icon.innerHTML = '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>';
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       DEMO ENGINE: REALISTIC LPU MOCK STREAM
+       -------------------------------------------------------------------------- */
+    async function executeDemoStream(assistantMsg) {
+      const userPrompt = state.messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
+      const isReasoningModel = state.selectedModel.includes('r1') || state.selectedModel.includes('qwq');
+      const isJsonMode = state.params.jsonMode;
+
+      // Realistic response generation depending on prompt content
+      let mockReasoning = '';
+      let mockAnswer = '';
+
+      if (isReasoningModel) {
+        mockReasoning = `The user is inquiring about: "${userPrompt.slice(0, 80)}..."
+Step 1: Analyze computational bottleneck: Traditional GPUs suffer from memory bandwidth wall (HBM/GDDR) when sequentially autoregressing single tokens.
+Step 2: Contrast Groq LPU architecture: LPUs feature deterministic static scheduling, hundreds of megabytes of on-chip SRAM, and zero dynamic caching misses.
+Step 3: Factor in batch size = 1 inference dynamics: LPUs execute every single layer in predictable clock cycles without GPU instruction stalls.
+Step 4: Synthesize a clear, compelling answer with precise performance comparisons.`;
+      }
+
+      if (isJsonMode) {
+        mockAnswer = JSON.stringify({
+          status: "success",
+          provider: "Groq LPU",
+          model_selected: state.selectedModel,
+          architecture: "Tensor Streaming Processor (TSP)",
+          throughput_tokens_per_sec: state.selectedModel.includes('8b') ? 850 : 330,
+          latency_ttft_ms: 36,
+          advantage: "Deterministic static SRAM execution eliminates memory bandwidth bottlenecks."
+        }, null, 2);
+      } else if (userPrompt.toLowerCase().includes('code') || userPrompt.toLowerCase().includes('python')) {
+        mockAnswer = `Here is an idiomatic example showcasing low-latency inference on the **Groq LPU** using Python:
+
+\`\`\`python
+import os
+from groq import Groq
+
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+
+completion = client.chat.completions.create(
+    model="${state.selectedModel}",
+    messages=[
+        {"role": "system", "content": "You are Groq Studio."},
+        {"role": "user", "content": "${escapeQuotes(userPrompt)}"}
+    ],
+    temperature=${state.params.temperature},
+    max_tokens=${state.params.maxTokens},
+    stream=True
+)
+
+for chunk in completion:
+    delta = chunk.choices[0].delta.content or ""
+    print(delta, end="", flush=True)
+\`\`\`
+
+### Key Benefits:
+- **Zero Memory-Wall Latency**: Predictable clock execution per token.
+- **Blistering Throughput**: Easily sustains 300 to 800+ tokens/sec on high-demand workloads!`;
+      } else {
+        mockAnswer = `**Groq LPUs (Language Processing Units)** achieve dramatically lower latency and significantly higher tokens/second due to three fundamental architectural breakthroughs:
+
+1. **Deterministic Static Architecture**: Traditional GPUs rely on complex runtime schedulers, out-of-order execution, and dynamic caching originally engineered for parallel graphics shaders. In contrast, Groq LPUs schedule every single instruction and memory hop at compile time, eliminating runtime jitter.
+
+2. **Ultra-High Bandwidth On-Chip SRAM**: Instead of constantly fetching model weights across external high-bandwidth memory (HBM) buses—which causes severe memory bandwidth bottlenecks during autoregressive token generation—Groq chips store active tensor streams directly in ultra-fast on-die SRAM.
+
+3. **Sub-40ms TTFT (Time to First Token)**: Because there is zero GPU driver warmup or dynamic batch re-negotiation, responses stream instantly to the user at **300 to 850+ tokens per second**, feeling instantaneous compared to conventional cloud GPU clusters.`;
+      }
+
+      const startTime = performance.now();
+      let ttftRecorded = null;
+
+      // Stream reasoning first if model has reasoning
+      if (mockReasoning) {
+        assistantMsg.reasoning = '';
+        const reasoningWords = mockReasoning.split(' ');
+        for (let i = 0; i < reasoningWords.length; i++) {
+          if (!state.isGenerating) break;
+          assistantMsg.reasoning += (i === 0 ? '' : ' ') + reasoningWords[i];
+          if (!ttftRecorded) ttftRecorded = Math.round(performance.now() - startTime);
+          renderAssistantStream(assistantMsg, true);
+          await sleep(15);
+        }
+      }
+
+      // Stream final answer tokens
+      assistantMsg.content = '';
+      const tokens = mockAnswer.split(/(\s+|\n+)/);
+      for (let i = 0; i < tokens.length; i++) {
+        if (!state.isGenerating) break;
+        assistantMsg.content += tokens[i];
+        if (!ttftRecorded) ttftRecorded = Math.round(performance.now() - startTime);
+        renderAssistantStream(assistantMsg, false);
+        // Mimic Groq's ~400-600 tokens/sec speed (2-5ms per chunk)
+        await sleep(Math.floor(Math.random() * 6) + 3);
+      }
+
+      const totalTimeMs = performance.now() - startTime;
+      const totalTokens = Math.max(12, Math.round(assistantMsg.content.length / 3.8));
+      const totalSec = Math.max(0.08, totalTimeMs / 1000);
+      const tps = Math.round(totalTokens / totalSec);
+
+      assistantMsg.metrics = {
+        ttft: ttftRecorded || 36,
+        tokensPerSec: tps > 850 ? 850 : (tps < 280 ? 340 : tps),
+        totalTokens: totalTokens,
+        totalTime: totalSec.toFixed(2),
+        thinkTime: isReasoningModel ? 'Thought for 0.42s' : null
+      };
+
+      recordSessionMetrics(assistantMsg.metrics);
+      setGeneratingState(false);
+      renderConversation();
+    }
+
+    /* --------------------------------------------------------------------------
+       REAL GROQ CHAT COMPLETIONS API CALL
+       -------------------------------------------------------------------------- */
+    async function executeRealGroqApi(assistantMsg) {
+      state.abortController = new AbortController();
+      const startTime = performance.now();
+      let ttftRecorded = null;
+      let tokenChunkCount = 0;
+
+      const payloadMessages = [];
+      if (state.systemPrompt.trim()) {
+        payloadMessages.push({ role: 'system', content: state.systemPrompt.trim() });
+      }
+      state.messages.forEach(m => {
+        if (m.id !== assistantMsg.id && m.content.trim()) {
+          payloadMessages.push({ role: m.role, content: m.content });
+        }
+      });
+
+      const bodyData = {
+        model: state.selectedModel,
+        messages: payloadMessages,
+        temperature: state.params.temperature,
+        max_tokens: state.params.maxTokens,
+        stream: state.params.stream
+      };
+
+      if (state.params.jsonMode) {
+        bodyData.response_format = { type: 'json_object' };
+      }
+
+      try {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${state.apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bodyData),
+          signal: state.abortController.signal
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `Groq API Error: HTTP ${response.status}`);
+        }
+
+        if (state.params.stream) {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop(); // keep last unfinished line
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed || trimmed.startsWith(':')) continue;
+              if (trimmed === 'data: [DONE]') continue;
+
+              if (trimmed.startsWith('data: ')) {
+                try {
+                  const parsed = JSON.parse(trimmed.slice(6));
+                  const delta = parsed.choices?.[0]?.delta;
+                  if (!delta) continue;
+
+                  if (!ttftRecorded) {
+                    ttftRecorded = Math.round(performance.now() - startTime);
+                  }
+
+                  // Handle reasoning tokens if available
+                  if (delta.reasoning_content || delta.reasoning) {
+                    assistantMsg.reasoning = (assistantMsg.reasoning || '') + (delta.reasoning_content || delta.reasoning);
+                    renderAssistantStream(assistantMsg, true);
+                  }
+
+                  if (delta.content) {
+                    tokenChunkCount++;
+                    const chunk = delta.content;
+
+                    // Handle <think> tags if embedded in content
+                    if (chunk.includes('<think>')) {
+                      // parsing begin thinking
+                    }
+                    assistantMsg.content += chunk;
+                    renderAssistantStream(assistantMsg, false);
+                  }
+                } catch (jsonErr) {
+                  // ignore non-json stream fragment
+                }
+              }
+            }
+          }
+        } else {
+          // Non-streaming response
+          const data = await response.json();
+          ttftRecorded = Math.round(performance.now() - startTime);
+          const rawContent = data.choices?.[0]?.message?.content || '';
+          
+          // Parse potential <think> ... </think> tags
+          if (rawContent.includes('<think>') && rawContent.includes('</think>')) {
+            const parts = rawContent.split('</think>');
+            assistantMsg.reasoning = parts[0].replace('<think>', '').trim();
+            assistantMsg.content = parts[1].trim();
+          } else {
+            assistantMsg.content = rawContent;
+          }
+        }
+
+        const totalTimeMs = performance.now() - startTime;
+        const totalTokens = tokenChunkCount || Math.max(10, Math.round(assistantMsg.content.length / 3.8));
+        const totalSec = Math.max(0.05, totalTimeMs / 1000);
+        const tps = Math.round(totalTokens / totalSec);
+
+        assistantMsg.metrics = {
+          ttft: ttftRecorded || 38,
+          tokensPerSec: tps,
+          totalTokens: totalTokens,
+          totalTime: totalSec.toFixed(2),
+          thinkTime: assistantMsg.reasoning ? `Thought for ${(totalTimeMs / 2000).toFixed(2)}s` : null
+        };
+
+        recordSessionMetrics(assistantMsg.metrics);
+        showToast('Generation complete', '⚡');
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          showToast('Stream cancelled', '⏹️');
+        } else {
+          assistantMsg.content = `❌ **Error:** ${err.message}\n\n*Tip: Check that your Groq API key is valid or toggle back to Demo Mode to test offline.*`;
+          showToast(`Error: ${err.message}`, '❌');
+        }
+      } finally {
+        setGeneratingState(false);
+        state.abortController = null;
+        renderConversation();
+      }
+    }
+
+    function renderAssistantStream(msg, isReasoning) {
+      const contentEl = document.getElementById(`content-${msg.id}`);
+      if (contentEl) {
+        contentEl.innerHTML = formatMarkdown(msg.content) + '<span class="streaming-cursor"></span>';
+      }
+      if (msg.reasoning) {
+        let accEl = document.getElementById(`reasoning-${msg.id}`);
+        if (!accEl) {
+          // Add reasoning accordion if not exists
+          const parent = contentEl?.parentElement;
+          if (parent) {
+            accEl = document.createElement('div');
+            accEl.className = 'reasoning-accordion';
+            accEl.id = `reasoning-${msg.id}`;
+            accEl.innerHTML = `
+              <div class="reasoning-header" onclick="toggleReasoningAccordion('${msg.id}')">
+                <div class="reasoning-title">
+                  <span>💭</span>
+                  <span>Reasoning / Thought Process</span>
+                </div>
+                <div class="reasoning-meta">
+                  <span>Streaming thoughts...</span>
+                </div>
+              </div>
+              <div class="reasoning-body"></div>
+            `;
+            parent.insertBefore(accEl, contentEl);
+          }
+        }
+        if (accEl) {
+          const bodyEl = accEl.querySelector('.reasoning-body');
+          if (bodyEl) bodyEl.textContent = msg.reasoning;
+        }
+      }
+    }
+
+    function recordSessionMetrics(m) {
+      state.sessionMetrics.totalRequests++;
+      state.sessionMetrics.totalTokens += m.totalTokens;
+      state.sessionMetrics.sumTtft += m.ttft;
+      state.sessionMetrics.sumSpeed += m.tokensPerSec;
+
+      document.getElementById('metricTotalReqs').textContent = state.sessionMetrics.totalRequests;
+      document.getElementById('metricTotalTokens').textContent = state.sessionMetrics.totalTokens.toLocaleString();
+      document.getElementById('metricAvgTtft').textContent = Math.round(state.sessionMetrics.sumTtft / state.sessionMetrics.totalRequests) + ' ms';
+      document.getElementById('metricAvgSpeed').textContent = Math.round(state.sessionMetrics.sumSpeed / state.sessionMetrics.totalRequests) + ' T/s';
+    }
+
+    /* ==========================================================================
+       SIDEBAR PARAMETER CONTROLS
+       ========================================================================== */
+    function syncTempSlider(val) {
+      const num = parseFloat(val);
+      if (!isNaN(num)) {
+        state.params.temperature = num;
+        document.getElementById('tempSlider').value = num;
+      }
+    }
+    function syncTempInput(val) {
+      state.params.temperature = parseFloat(val);
+      document.getElementById('tempInput').value = parseFloat(val).toFixed(2);
+    }
+
+    function syncMaxTokensSlider(val) {
+      const num = parseInt(val, 10);
+      if (!isNaN(num)) {
+        state.params.maxTokens = num;
+        document.getElementById('maxTokensSlider').value = num;
+      }
+    }
+    function syncMaxTokensInput(val) {
+      state.params.maxTokens = parseInt(val, 10);
+      document.getElementById('maxTokensInput').value = val;
+    }
+
+    function onJsonModeChange() {
+      state.params.jsonMode = document.getElementById('jsonModeToggle').checked;
+      if (state.params.jsonMode) {
+        showToast('JSON Mode enabled: Enforcing JSON Object', '📦');
+      }
+    }
+
+    function resetParameters() {
+      state.params = {
+        temperature: 1.0,
+        maxTokens: 2048,
+        reasoningEffort: 'medium',
+        stream: true,
+        jsonMode: false,
+        browserSearch: false,
+        codeInterpreter: false
+      };
+      document.getElementById('tempInput').value = '1.00';
+      document.getElementById('tempSlider').value = '1.00';
+      document.getElementById('maxTokensInput').value = '2048';
+      document.getElementById('maxTokensSlider').value = '2048';
+      document.getElementById('reasoningEffortSelect').value = 'medium';
+      document.getElementById('streamToggle').checked = true;
+      document.getElementById('jsonModeToggle').checked = false;
+      document.getElementById('browserSearchToggle').checked = false;
+      document.getElementById('codeInterpreterToggle').checked = false;
+      showToast('Reset parameters to defaults', '🔄');
+    }
+
+    /* ==========================================================================
+       TOOLS & MCP MANAGERS
+       ========================================================================== */
+    function renderToolsList() {
+      const list = document.getElementById('toolsList');
+      list.innerHTML = '';
+      if (!state.tools.length) {
+        list.innerHTML = '<div style="font-size: 11.5px; color: var(--text-faint); padding: 4px 0;">No tools attached</div>';
+        return;
+      }
+      state.tools.forEach((tool, idx) => {
+        const item = document.createElement('div');
+        item.className = 'tool-chip-item';
+        item.innerHTML = `
+          <div class="tool-chip-info" title="${escapeHtml(tool.description)}">
+            <span style="color: var(--peach-dark);">ƒ</span>
+            <span>${tool.name}</span>
+          </div>
+          <button class="tool-remove-btn" onclick="removeTool(${idx})" title="Remove Tool">✕</button>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function removeTool(idx) {
+      state.tools.splice(idx, 1);
+      renderToolsList();
+      showToast('Tool removed', '🗑️');
+    }
+
+    function openAddToolModal() {
+      loadToolPreset('weather');
+      document.getElementById('toolModal').classList.add('open');
+    }
+
+    function loadToolPreset(preset) {
+      const presets = {
+        weather: {
+          name: "get_current_weather",
+          description: "Get current weather conditions for a given location",
+          schema: '{\n  "type": "function",\n  "function": {\n    "name": "get_current_weather",\n    "description": "Get current weather conditions for a given location",\n    "parameters": {\n      "type": "object",\n      "properties": {\n        "location": { "type": "string" },\n        "unit": { "type": "string", "enum": ["celsius", "fahrenheit"] }\n      },\n      "required": ["location"]\n    }\n  }\n}'
+        },
+        calculator: {
+          name: "calculate_expression",
+          description: "Safely evaluate a mathematical expression",
+          schema: '{\n  "type": "function",\n  "function": {\n    "name": "calculate_expression",\n    "description": "Safely evaluate a mathematical expression",\n    "parameters": {\n      "type": "object",\n      "properties": {\n        "expression": { "type": "string" }\n      },\n      "required": ["expression"]\n    }\n  }\n}'
+        },
+        database: {
+          name: "query_knowledge_base",
+          description: "Search internal documentation repository",
+          schema: '{\n  "type": "function",\n  "function": {\n    "name": "query_knowledge_base",\n    "description": "Search internal documentation repository",\n    "parameters": {\n      "type": "object",\n      "properties": {\n        "query": { "type": "string" },\n        "max_results": { "type": "integer" }\n      },\n      "required": ["query"]\n    }\n  }\n}'
+        }
+      };
+      const found = presets[preset] || presets.weather;
+      document.getElementById('toolJsonTextarea').value = found.schema;
+    }
+
+    function addCustomTool() {
+      const raw = document.getElementById('toolJsonTextarea').value.trim();
+      try {
+        const parsed = JSON.parse(raw);
+        const name = parsed.function?.name || parsed.name || 'custom_tool';
+        const desc = parsed.function?.description || parsed.description || 'Custom Function';
+        state.tools.push({ name, description: desc, schema: raw });
+        renderToolsList();
+        closeModal('toolModal');
+        showToast(`Added tool: ${name}`, '🛠️');
+      } catch (err) {
+        showToast('Invalid JSON schema: Please check syntax', '❌');
+      }
+    }
+
+    /* MCP Servers */
+    function renderMcpList() {
+      const list = document.getElementById('mcpList');
+      list.innerHTML = '';
+      if (!state.mcpServers.length) {
+        list.innerHTML = '<div style="font-size: 11.5px; color: var(--text-faint); padding: 4px 0;">No servers attached</div>';
+        return;
+      }
+      state.mcpServers.forEach((srv, idx) => {
+        const item = document.createElement('div');
+        item.className = 'tool-chip-item';
+        item.innerHTML = `
+          <div class="tool-chip-info" title="${srv.url}">
+            <span style="color: var(--mint-dark); font-size: 10px;">●</span>
+            <span>${srv.name}</span>
+          </div>
+          <button class="tool-remove-btn" onclick="removeMcpServer(${idx})" title="Remove Server">✕</button>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function removeMcpServer(idx) {
+      state.mcpServers.splice(idx, 1);
+      renderMcpList();
+      showToast('MCP Server disconnected', '🔌');
+    }
+
+    function openAddMcpModal() {
+      document.getElementById('mcpNameInput').value = '';
+      document.getElementById('mcpUrlInput').value = '';
+      document.getElementById('mcpModal').classList.add('open');
+    }
+
+    function addMcpServer() {
+      const name = document.getElementById('mcpNameInput').value.trim();
+      const url = document.getElementById('mcpUrlInput').value.trim();
+      if (!name) {
+        showToast('Please provide a server name', '⚠️');
+        return;
+      }
+      state.mcpServers.push({ name, url: url || 'stdio:local' });
+      renderMcpList();
+      closeModal('mcpModal');
+      showToast(`Connected MCP Server: ${name}`, '🌐');
+    }
+
+    /* ==========================================================================
+       VIEW CODE MODAL (LIVE GENERATOR)
+       ========================================================================== */
+    function openCodeModal() {
+      switchCodeTab(state.activeCodeTab);
+      document.getElementById('codeModal').classList.add('open');
+    }
+
+    function switchCodeTab(tab) {
+      state.activeCodeTab = tab;
+      document.getElementById('tabCurl').classList.toggle('active', tab === 'curl');
+      document.getElementById('tabPython').classList.toggle('active', tab === 'python');
+      document.getElementById('tabJs').classList.toggle('active', tab === 'js');
+
+      const pre = document.getElementById('codeSnippetPre');
+      if (tab === 'curl') {
+        pre.textContent = generateCurlSnippet();
+      } else if (tab === 'python') {
+        pre.textContent = generatePythonSnippet();
+      } else if (tab === 'js') {
+        pre.textContent = generateJsSnippet();
+      }
+    }
+
+    function generateCurlSnippet() {
+      const msgs = [];
+      if (state.systemPrompt.trim()) {
+        msgs.push({ role: 'system', content: state.systemPrompt.trim() });
+      }
+      state.messages.forEach(m => {
+        if (m.content.trim()) msgs.push({ role: m.role, content: m.content });
+      });
+
+      const body = {
+        model: state.selectedModel,
+        messages: msgs,
+        temperature: state.params.temperature,
+        max_tokens: state.params.maxTokens,
+        stream: state.params.stream
+      };
+      if (state.params.jsonMode) {
+        body.response_format = { type: 'json_object' };
+      }
+
+      return `curl "https://api.groq.com/openai/v1/chat/completions" \\
+  -X POST \\
+  -H "Authorization: Bearer \${GROQ_API_KEY:-${state.apiKey || 'gsk_YOUR_KEY'}}" \\
+  -H "Content-Type: application/json" \\
+  -d '${JSON.stringify(body, null, 2)}'`;
+    }
+
+    function generatePythonSnippet() {
+      const msgs = [];
+      if (state.systemPrompt.trim()) {
+        msgs.push(`    {"role": "system", "content": "${escapeQuotes(state.systemPrompt.trim())}"}`);
+      }
+      state.messages.forEach(m => {
+        if (m.content.trim()) {
+          msgs.push(`    {"role": "${m.role}", "content": "${escapeQuotes(m.content)}"}`);
+        }
+      });
+
+      return `import os
+from groq import Groq
+
+# Initialize client
+client = Groq(
+    api_key=os.environ.get("GROQ_API_KEY", "${state.apiKey || 'gsk_YOUR_KEY'}"),
+)
+
+# Send request to Groq LPU
+response = client.chat.completions.create(
+    model="${state.selectedModel}",
+    messages=[
+${msgs.join(',\n')}
+    ],
+    temperature=${state.params.temperature},
+    max_tokens=${state.params.maxTokens},
+    stream=${state.params.stream ? 'True' : 'False'}${state.params.jsonMode ? ',\n    response_format={"type": "json_object"}' : ''}
+)
+
+${state.params.stream ? `# Stream response in real time
+for chunk in response:
+    content = chunk.choices[0].delta.content or ""
+    print(content, end="", flush=True)` : `# Print response
+print(response.choices[0].message.content)`}`;
+    }
+
+    function generateJsSnippet() {
+      const msgs = [];
+      if (state.systemPrompt.trim()) {
+        msgs.push({ role: 'system', content: state.systemPrompt.trim() });
+      }
+      state.messages.forEach(m => {
+        if (m.content.trim()) msgs.push({ role: m.role, content: m.content });
+      });
+
+      return `import fetch from 'node-fetch';
+
+async function callGroq() {
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": \`Bearer \${process.env.GROQ_API_KEY || "${state.apiKey || 'gsk_YOUR_KEY'}"}\`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "${state.selectedModel}",
+      messages: ${JSON.stringify(msgs, null, 6)},
+      temperature: ${state.params.temperature},
+      max_tokens: ${state.params.maxTokens},
+      stream: ${state.params.stream}${state.params.jsonMode ? ',\n      response_format: { type: "json_object" }' : ''}
+    })
+  });
+
+  const data = await response.json();
+  console.log(data.choices[0].message.content);
+}
+
+callGroq();`;
+    }
+
+    function copyCodeSnippet() {
+      const text = document.getElementById('codeSnippetPre').textContent;
+      navigator.clipboard.writeText(text);
+      showToast('Code snippet copied to clipboard!', '📋');
+    }
+
+    /* ==========================================================================
+       METRICS & DOCS MODALS
+       ========================================================================== */
+    function switchMainTab(tab) {
+      if (tab === 'playground') {
+        closeAllModals();
+      }
+    }
+    function openMetricsModal() {
+      document.getElementById('metricsModal').classList.add('open');
+    }
+    function openDocsModal() {
+      document.getElementById('docsModal').classList.add('open');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+    function closeAllModals() {
+      document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open'));
+    }
+
+    /* ==========================================================================
+       UTILITIES & FORMATTERS
+       ========================================================================== */
+    function formatMarkdown(text) {
+      if (!text) return '';
+      // Escape HTML
+      let html = escapeHtml(text);
+
+      // Code blocks ```lang ... ```
+      html = html.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+        return `<pre><span class="copy-code-tag" onclick="copyCodeBlock(this)">Copy</span><code>${code}</code></pre>`;
+      });
+
+      // Inline code `...`
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+      // Bold **...**
+      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+      // Italic *...*
+      html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+      // Convert linebreaks to paragraphs/breaks
+      const paras = html.split(/\n\n+/);
+      return paras.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+    }
+
+    function copyCodeBlock(btn) {
+      const pre = btn.closest('pre');
+      const code = pre.querySelector('code')?.innerText || '';
+      navigator.clipboard.writeText(code);
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+      showToast('Code block copied!', '📋');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeQuotes(str) {
+      if (!str) return '';
+      return str.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+  </script>
+</body>
+</html>
